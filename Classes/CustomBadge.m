@@ -79,6 +79,25 @@
 	return self;
 }
 
+- (id)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        
+		self.contentScaleFactor = [[UIScreen mainScreen] scale];
+		self.backgroundColor = [UIColor clearColor];
+		self.badgeText = @"";
+		self.badgeTextColor = [UIColor whiteColor];
+		self.badgeFrame = YES;
+		self.badgeFrameColor = [UIColor whiteColor];
+		self.badgeInsetColor = [UIColor redColor];
+		self.badgeCornerRoundness = 0.4;
+		self.badgeScaleFactor = 1.0;
+		self.badgeShining = YES;
+		//[self autoBadgeSizeWithString:@""];
+    }
+    return self;
+}
 
 // Use this method if you want to change the badge text after the first rendering 
 - (void) autoBadgeSizeWithString:(NSString *)badgeString
@@ -99,6 +118,24 @@
 	[self setNeedsDisplay];
 }
 
+- (CGSize)intrinsicContentSize {
+
+	CGSize retValue;
+	CGFloat rectWidth, rectHeight;
+	CGSize stringSize = [self.badgeText sizeWithFont:[UIFont boldSystemFontOfSize:12]];
+	CGFloat flexSpace;
+	if ([self.badgeText length]>=2) {
+		flexSpace = [self.badgeText length];
+		rectWidth = 15 + (stringSize.width + flexSpace); rectHeight = 25;
+		retValue = CGSizeMake(rectWidth*badgeScaleFactor, rectHeight*badgeScaleFactor);
+	} else {
+		retValue = CGSizeMake(25*badgeScaleFactor, 25*badgeScaleFactor);
+	}
+	
+	//NSLog(@"Intrinsic width: %f", retValue.width);
+	
+	return retValue;
+}
 
 // Creates a Badge with a given Text 
 + (CustomBadge*) customBadgeWithString:(NSString *)badgeString
@@ -114,8 +151,21 @@
 }
 
 
+- (void)setBadgeText:(NSString *)newBadgeText {
+	
+	if (! [badgeText isEqualToString:newBadgeText]) {
+		
+		NSString *oldValue = badgeText;
+		
+		badgeText = [newBadgeText retain];
+		
+		[oldValue release];
+		
+		[self setNeedsDisplay];
+		[self invalidateIntrinsicContentSize];
+	}
+}
 
- 
 
 // Draws the Badge with Quartz
 -(void) drawRoundedRectWithContext:(CGContextRef)context withRect:(CGRect)rect
