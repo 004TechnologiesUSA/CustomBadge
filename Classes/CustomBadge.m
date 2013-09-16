@@ -89,8 +89,8 @@
 		self.badgeText = @"";
 		self.badgeTextColor = [UIColor whiteColor];
 		self.badgeFrame = YES;
-		self.badgeFrameColor = [UIColor whiteColor];
-		self.badgeInsetColor = [UIColor redColor];
+		self.badgeFrameColor = self.tintColor;
+		self.badgeInsetColor = self.tintColor;
 		self.badgeCornerRoundness = 0.4;
 		self.badgeScaleFactor = 1.0;
 		self.badgeShining = YES;
@@ -104,7 +104,7 @@
 {
 	CGSize retValue;
 	CGFloat rectWidth, rectHeight;
-	CGSize stringSize = [badgeString sizeWithFont:[UIFont boldSystemFontOfSize:12]];
+	CGSize stringSize = [badgeString sizeWithAttributes:@{NSFontAttributeName : self.badgeFont}];
 	CGFloat flexSpace;
 	if ([badgeString length]>=2) {
 		flexSpace = [badgeString length];
@@ -122,7 +122,7 @@
 
 	CGSize retValue;
 	CGFloat rectWidth, rectHeight;
-	CGSize stringSize = [self.badgeText sizeWithFont:[UIFont boldSystemFontOfSize:12]];
+	CGSize stringSize = [self.badgeText sizeWithAttributes:@{NSFontAttributeName : self.badgeFont}];
 	CGFloat flexSpace;
 	if ([self.badgeText length]>=2) {
 		flexSpace = [self.badgeText length];
@@ -185,7 +185,7 @@
 	CGContextAddArc(context, maxX-radius, maxY-radius, radius, 0, M_PI/2, 0);
 	CGContextAddArc(context, minX+radius, maxY-radius, radius, M_PI/2, M_PI, 0);
 	CGContextAddArc(context, minX+radius, minY+radius, radius, M_PI, M_PI+M_PI/2, 0);
-	CGContextSetShadowWithColor(context, CGSizeMake(1.0,1.0), 3, [[UIColor blackColor] CGColor]);
+	//CGContextSetShadowWithColor(context, CGSizeMake(1.0,1.0), 3, [[UIColor blackColor] CGColor]);
     CGContextFillPath(context);
 
 	CGContextRestoreGState(context);
@@ -247,10 +247,11 @@
 	
 	
     CGContextBeginPath(context);
-	CGFloat lineSize = 2;
-	if(self.badgeScaleFactor>1) {
-		lineSize += self.badgeScaleFactor*0.25;
-	}
+//	CGFloat lineSize = 2;
+//	if(self.badgeScaleFactor>1) {
+//		lineSize += self.badgeScaleFactor*0.25;
+//	}
+	CGFloat lineSize = 1;
 	CGContextSetLineWidth(context, lineSize);
 	CGContextSetStrokeColorWithColor(context, [self.badgeFrameColor CGColor]);
 	CGContextAddArc(context, maxX-radius, minY+radius, radius, M_PI+(M_PI/2), 0, 0);
@@ -281,11 +282,18 @@
 		if ([self.badgeText length]<2) {
 			sizeOfFont += sizeOfFont*0.20;
 		}
-		UIFont *textFont = [UIFont boldSystemFontOfSize:sizeOfFont];
-		CGSize textSize = [self.badgeText sizeWithFont:textFont];
-		[self.badgeText drawAtPoint:CGPointMake((rect.size.width/2-textSize.width/2), (rect.size.height/2-textSize.height/2)) withFont:textFont];
+
+		CGSize textSize = [self.badgeText sizeWithAttributes:@{NSFontAttributeName : self.badgeFont}];
+		[self.badgeText drawAtPoint:CGPointMake((rect.size.width/2-textSize.width/2), (rect.size.height/2-textSize.height/2)) withAttributes:@{NSFontAttributeName : self.badgeFont, NSForegroundColorAttributeName : self.badgeTextColor}];
 	}
 	
+}
+
+- (void)tintColorDidChange {
+	
+	self.badgeFrameColor = self.tintColor;
+	self.badgeTextColor = self.tintColor;
+	[self setNeedsDisplay];
 }
 
 - (void)dealloc {
